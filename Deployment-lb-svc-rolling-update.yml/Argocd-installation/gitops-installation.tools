@@ -1,0 +1,44 @@
+###Argo CD Installation on Kubernetes#####
+1. Create Namespace
+kubectl create namespace argocd
+2. Install Argo CD
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+3. Check Pods
+kubectl get pods -n argocd
+
+Wait until all pods are in Running state.
+
+4. Expose Argo CD Server (NodePort)
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
+
+Check service:
+
+kubectl get svc -n argocd
+5. Get Initial Admin Password
+kubectl get secret argocd-initial-admin-secret -n argocd -o yaml
+
+Or directly decode:
+
+kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode
+
+Username:
+
+admin
+6. Access Argo CD UI
+
+Open browser:
+
+https://<NodeIP>:<NodePort>
+
+Login with:
+
+Username: admin
+Password: (decoded password)
+7. Optional – Install Argo CD CLI
+curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+chmod +x argocd
+sudo mv argocd /usr/local/bin/
+
+Check version:
+
+argocd version

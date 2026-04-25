@@ -1,0 +1,54 @@
+# deployment.yml (Rolling Update Deployment)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-deployment
+  labels:
+    app: my-app
+spec:
+  replicas: 3
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+
+  selector:
+    matchLabels:
+      app: my-app
+
+  template:
+    metadata:
+      labels:
+        app: my-app
+
+    spec:
+      containers:
+        - name: my-app-container
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+
+---
+# lb-service.yml (LoadBalancer Service)
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-loadbalancer
+  labels:
+    app: my-app
+
+spec:
+  type: LoadBalancer
+
+  selector:
+    app: my-app
+
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30007
